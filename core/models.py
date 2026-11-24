@@ -43,8 +43,6 @@ class Company(AuditedModel):
     financial_year_start_month = models.PositiveSmallIntegerField(
         choices=MONTHS, default=1
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Company profile"
@@ -52,3 +50,18 @@ class Company(AuditedModel):
 
     def __str__(self):
         return self.name
+class DocumentSequence(models.Model):
+    code = models.CharField(max_length=10, unique=True)
+    name = models.CharField(max_length=100)
+    prefix = models.CharField(max_length=10)
+    next_number = models.PositiveIntegerField(default=1)
+    padding = models.PositiveSmallIntegerField(default=4)
+    include_year = models.BooleanField(default=True)
+    reset_yearly = models.BooleanField(default=True)
+    last_year = models.PositiveSmallIntegerField(null=True, blank=True, editable=False)
+
+    class Meta:
+        ordering = ["code"]
+
+    def __str__(self):
+        return f"{self.code} - {self.name}"
