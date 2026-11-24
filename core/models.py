@@ -1,7 +1,28 @@
 from django.db import models
+from django.conf import settings
+from django.db import models
+from simple_history.models import HistoricalRecords
 
 
-class Company(models.Model):
+class AuditedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True, editable=False,
+        on_delete=models.PROTECT, related_name="+",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True, editable=False,
+        on_delete=models.PROTECT, related_name="+",
+    )
+    history = HistoricalRecords(inherit=True)
+
+    class Meta:
+        abstract = True
+
+class Company(AuditedModel):
     MONTHS = [
         (1, "January"), (2, "February"), (3, "March"), (4, "April"),
         (5, "May"), (6, "June"), (7, "July"), (8, "August"),
